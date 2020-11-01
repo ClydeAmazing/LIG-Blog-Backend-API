@@ -24,7 +24,7 @@ export function getPost(id) {
   return (dispatch) => {
     return axios({
       baseURL: config.api,
-      url: '/posts/' + id +'/',
+      url: '/posts/' + id,
       method: 'GET'
     })
     .then((res) => {

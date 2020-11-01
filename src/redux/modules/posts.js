@@ -19,7 +19,7 @@ export function listPosts(page = 1) {
   return (dispatch) => {
     axios({
       baseURL: config.api,
-      url: '/posts/',
+      url: '/posts',
       method: 'GET',
       params: {
         page

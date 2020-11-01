@@ -16,7 +16,8 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_flag = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
-    image = models.ImageField(upload_to='images', null=True, blank=True)
+    image = models.URLField(blank=True, null=True)
+    # image = models.ImageField(upload_to='images', null=True, blank=True)
 
     def save(self, *args, **kwargs):
         slug_text = slugify('{}-{}'.format(str(self.pk), self.title))
@@ -30,7 +31,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     title = models.CharField(max_length=255, null=True, blank=True)
     body = models.TextField()
-    commentable_type = models.CharField(max_length=50, null=False, blank=False) # App \\ Post ??
+    commentable_type = models.CharField(max_length=50, null=True, blank=True) # App \\ Post ??
     commentable_id = models.BooleanField(default=True)
     creator_id = models.ForeignKey(User, default=1, null=True, on_delete=models.SET_NULL)
     parent_id = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
@@ -44,3 +45,10 @@ class Comment(models.Model):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+@receiver(post_save, sender=Post)
+def generate_slug(sender, instance, created, **kwargs):
+    if created:
+        slug_text = slugify('{}-{}'.format(str(instance.pk), instance.title))
+        instance.slug = slug_text[:50]
+        instance.save()
